@@ -76,6 +76,7 @@ def main():
     while True:
         for queue, url in URLS.items():
             check_and_alert(queue, url)
+            time.sleep(5)
         time.sleep(CHECK_INTERVAL)
 
 if __name__ == "__main__":
