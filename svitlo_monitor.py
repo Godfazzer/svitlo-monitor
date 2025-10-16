@@ -1,7 +1,4 @@
-import os
-import requests
-import json
-import time
+import os, requests, json, time
 
 URLS = {
     "4.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=4.2",
@@ -15,7 +12,6 @@ CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", "300"))
 CACHE_DIR = "cache"
 
 def send_telegram(text):
-    """Send Telegram message with error logging."""
     try:
         resp = requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
@@ -25,12 +21,11 @@ def send_telegram(text):
         if resp.status_code != 200:
             print(f"Telegram error {resp.status_code}: {resp.text}")
         else:
-            print("Telegram message sent successfully.")
+            print("Telegram message was sent")
     except Exception as e:
         print("Telegram send error:", e)
 
 def fetch_schedule(url):
-    """Fetch JSON schedule from the given URL with headers."""
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                       "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -61,17 +56,17 @@ def check_and_alert(queue, url):
         last = load_last(queue)
 
         if last != current:
-            message = f"⚡ Svitlo schedule updated for queue {queue}!\n\n{json.dumps(current, ensure_ascii=False, indent=2)}"
+            message = f"⚡ Svitlo змінено графік для черги {queue}!\n\n{json.dumps(current, ensure_ascii=False, indent=2)}"
             send_telegram(message)
             save_current(queue, current)
-            print(f"[{queue}] Change detected → message sent.")
+            print(f"[{queue}] Change detected → msg sent.")
         else:
             print(f"[{queue}] No change.")
     except Exception as e:
         print(f"[{queue}] Error: {e}")
 
 def main():
-    send_telegram("🟢 Svitlo monitor started.")
+    send_telegram("🟢 Svitlo-monitor запущено.")
     while True:
         for queue, url in URLS.items():
             check_and_alert(queue, url)
