@@ -3,7 +3,6 @@ import requests
 import json
 import time
 
-# === CONFIG ===
 URLS = {
     "4.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=4.2",
     "5.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=5.2",
@@ -12,7 +11,7 @@ URLS = {
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
-CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", "300"))  # 5 min default
+CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", "300"))
 CACHE_DIR = "cache"
 
 def send_telegram(text):
