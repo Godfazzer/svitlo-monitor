@@ -1,17 +1,6 @@
 services:
   svitlo-monitor:
+    build: .
     container_name: svitlo-monitor
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: svitlo-monitor:latest
     restart: unless-stopped
-    env_file:
-      - .env
-    volumes:
-      - ./cache:/app/cache
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    env_file: .env

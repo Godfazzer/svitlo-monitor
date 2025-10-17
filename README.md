@@ -1,1 +1,1 @@
-⚡ Svitlo Monitor v0.1
+⚡ Svitlo Monitor
