@@ -15,7 +15,7 @@ def send_telegram(text):
     try:
         resp = requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-            json={"chat_id": CHAT_ID, "text": text},
+            json={"chat_id": CHAT_ID, "text": text, "parse_mode": "Markdown"},
             timeout=10
         )
         if resp.status_code != 200:
@@ -56,7 +56,26 @@ def check_and_alert(queue, url):
         last = load_last(queue)
 
         if last != current:
-            message = f"⚡ Svitlo змінено графік для черги {queue}!\n\n{json.dumps(current, ensure_ascii=False, indent=2)}"
+
+            # Extract key info
+            try:
+                entry = current[0]
+                date = entry.get("eventDate", "?")
+                created = entry.get("createdAt", "?")
+                schedule = entry["queues"].get(queue, [])
+                times = "\n".join([f"🕒 {x['shutdownHours']}" for x in schedule]) or "–"
+            except Exception as e:
+                date, created, times = "?", "?", f"⚠️ Parse error: {e}"
+
+            # Format the Telegram message
+            message = (
+                f"⚡ *Змінився графік відключень!* 🟡\n"
+                f"*Черга:* {queue}\n"
+                f"*Дата:* {date}\n"
+                f"*Створено:* {created}\n"
+                f"*Відключення:*\n{times}"
+            )
+
             send_telegram(message)
             save_current(queue, current)
             print(f"[{queue}] Change detected → msg sent.")
