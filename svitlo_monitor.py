@@ -68,6 +68,7 @@ def check_and_alert(queue, url):
         last = load_last(queue)
 
         if last != current:
+            parts = []
             for day in current:
                 date = day.get("eventDate", "?")
                 created = day.get("createdAt", "?")
@@ -80,17 +81,19 @@ def check_and_alert(queue, url):
                 else:
                     outages = "✅ Немає відключень"
 
-                message = (
-                    f"⚡ *Змінився графік відключень!* 🟡\n"
-                    f"*Черга:* {queue}\n"
-                    f"*Дата:* {date}\n"
-                    f"*Створено:* {created}\n"
-                    f"*Відключення:*\n{outages}"
+                parts.append(
+                    f"*Дата:* {date}\n*Створено:* {created}\n*Відключення:*\n{outages}"
                 )
-                send_telegram(message)
 
+            message = (
+                f"⚡ *Змінився графік відключень!* 🟡\n"
+                f"*Черга:* {queue}\n\n"
+                + "\n\n".join(parts)
+            )
+
+            send_telegram(message)
             save_current(queue, current)
-            print(f"[{queue}] Change detected → messages sent for all days.")
+            print(f"[{queue}] Change detected → message sent for all days.")
         else:
             print(f"[{queue}] No change.")
     except Exception as e:
