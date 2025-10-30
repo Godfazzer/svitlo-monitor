@@ -71,7 +71,7 @@ def check_and_alert(queue, url):
             parts = []
             for day in current:
                 date = day.get("eventDate", "?")
-                created = day.get("createdAt", "?")
+                updated = day.get("scheduleApprovedSince", "?")
                 qdata = day.get("queues", {}).get(queue, [])
 
                 if qdata:
@@ -82,7 +82,7 @@ def check_and_alert(queue, url):
                     outages = "✅ Немає відключень"
 
                 parts.append(
-                    f"*Дата:* {date}\n*Створено:* {created}\n*Відключення:*\n{outages}"
+                    f"*Дата:* {date}\n*Оновлено:* {updated}\n*Відключення:*\n{outages}"
                 )
 
             message = (
