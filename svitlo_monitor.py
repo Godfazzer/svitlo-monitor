@@ -61,12 +61,27 @@ def save_current(queue, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+def extract_relevant(schedule, queue):
+    """
+    Extract only the relevant parts for comparison:
+    eventDate and shutdownHours for this queue.
+    """
+    result = []
+    for day in schedule:
+        date = day.get("eventDate")
+        qdata = day.get("queues", {}).get(queue, [])
+        hours = [x.get("shutdownHours") for x in qdata]
+        result.append({"date": date, "hours": hours})
+    return result
+
+
 def check_and_alert(queue, url):
     try:
         current = fetch_schedule(url)
-        last = load_last(queue)
+        current_relevant = extract_relevant(current, queue)
+        last_relevant = extract_relevant(load_last(queue) or [], queue)
 
-        if last != current:
+        if last_relevant != current_relevant:
             parts = []
             for day in current:
                 date = day.get("eventDate", "?")
@@ -95,9 +110,9 @@ def check_and_alert(queue, url):
 
             send_telegram(message)
             save_current(queue, current)
-            print(f"[{queue}] Change detected → message sent for all days.")
+            print(f"[{queue}] Change in shutdown hours → message sent.")
         else:
-            print(f"[{queue}] No change.")
+            print(f"[{queue}] No change in shutdown hours.")
     except Exception as e:
         print(f"[{queue}] Error: {e}")
 
