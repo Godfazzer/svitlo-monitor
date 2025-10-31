@@ -2,8 +2,12 @@ import os, requests, json, time
 
 URLS = {
     "4.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=4.2",
-    "5.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=5.2",
     "3.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=3.2"
+}
+
+QUEUE_NAMES = {
+    "4.2": "Гузара",
+    "3.2": "Ленкавського"
 }
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -85,9 +89,12 @@ def check_and_alert(queue, url):
                     f"*Дата:* {date}\n*Оновлено:* {updated}\n*Відключення:*\n{outages}"
                 )
 
+            display_name = QUEUE_NAMES.get(queue)
+            queue_label = f"{queue} ({display_name})" if display_name else queue
+
             message = (
                 f"⚡ *Змінився графік відключень!* 🟡\n"
-                f"*Черга:* {queue}\n\n"
+                f"*Черга:* {queue_label}\n\n"
                 + "\n\n".join(parts)
             )
 
