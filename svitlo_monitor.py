@@ -17,7 +17,6 @@ CACHE_DIR = "cache"
 
 
 def send_telegram(text):
-    """Send a message to Telegram."""
     try:
         resp = requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
@@ -33,7 +32,6 @@ def send_telegram(text):
 
 
 def fetch_schedule(url):
-    """Fetch JSON data from the Svitlo API."""
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -50,7 +48,6 @@ def fetch_schedule(url):
 
 
 def load_last(queue):
-    """Load the last saved schedule from cache."""
     path = f"{CACHE_DIR}/{queue}.json"
     if os.path.exists(path):
         with open(path, "r") as f:
@@ -59,14 +56,12 @@ def load_last(queue):
 
 
 def save_current(queue, data):
-    """Save the current schedule to cache."""
     os.makedirs(CACHE_DIR, exist_ok=True)
     with open(f"{CACHE_DIR}/{queue}.json", "w") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
 def check_and_alert(queue, url):
-    """Compare schedules and send alerts if changed."""
     try:
         current = fetch_schedule(url)
         last = load_last(queue)
@@ -108,7 +103,6 @@ def check_and_alert(queue, url):
 
 
 def main():
-    """Main loop."""
     send_telegram("🟢 Svitlo-monitor запущено.")
     while True:
         for queue, url in URLS.items():
