@@ -62,10 +62,6 @@ def save_current(queue, data):
 
 
 def extract_relevant(schedule, queue):
-    """
-    Extract only the relevant parts for comparison:
-    eventDate and shutdownHours for this queue.
-    """
     result = []
     for day in schedule:
         date = day.get("eventDate")
@@ -82,22 +78,26 @@ def check_and_alert(queue, url):
         last_relevant = extract_relevant(load_last(queue) or [], queue)
 
         if last_relevant != current_relevant:
-            parts = []
-            for day in current:
-                date = day.get("eventDate", "?")
-                updated = day.get("scheduleApprovedSince", "?")
-                qdata = day.get("queues", {}).get(queue, [])
-
-                if qdata:
-                    outages = "\n".join(
-                        [f"🕒 {x.get('shutdownHours', '?')}" for x in qdata]
+            if not current:
+                # if API lisr is empty []
+                parts = [
+                    f"*Дата:* ?\n*Оновлено:* ?\n*Відключення:*\n✅ Немає відключень"
+                ]
+            else:
+                parts = []
+                for day in current:
+                    date = day.get("eventDate", "?")
+                    updated = day.get("scheduleApprovedSince", "?")
+                    qdata = day.get("queues", {}).get(queue, [])
+                    if qdata:
+                        outages = "\n".join(
+                            [f"🕒 {x.get('shutdownHours', '?')}" for x in qdata]
+                        )
+                    else:
+                        outages = "✅ Немає відключень"
+                    parts.append(
+                        f"*Дата:* {date}\n*Оновлено:* {updated}\n*Відключення:*\n{outages}"
                     )
-                else:
-                    outages = "✅ Немає відключень"
-
-                parts.append(
-                    f"*Дата:* {date}\n*Оновлено:* {updated}\n*Відключення:*\n{outages}"
-                )
 
             display_name = QUEUE_NAMES.get(queue)
             queue_label = f"{queue} ({display_name})" if display_name else queue
