@@ -4,3 +4,13 @@ services:
     container_name: svitlo-monitor
     restart: unless-stopped
     env_file: .env
+  fake-svitlo-api:
+    build: ./fake_api
+    container_name: fake-svitlo-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+  environment:
+    QUEUE_FAKE_HOURS: "08:00-10:00"
+    QUEUE_FAKE_STATUS: "1"
+    QUEUE_FAKE_EMPTY: "0"

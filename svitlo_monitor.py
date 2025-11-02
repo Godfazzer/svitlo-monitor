@@ -2,12 +2,14 @@ import os, requests, json, time
 
 URLS = {
     "4.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=4.2",
-    "3.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=3.2"
+    "3.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=3.2",
+    "fake": "http://fake-svitlo-api:8000/schedule-by-queue?queue=fake"
 }
 
 QUEUE_NAMES = {
     "4.2": "Гузара",
-    "3.2": "Ленкавського"
+    "3.2": "Ленкавського",
+    "fake": "ТЕСТОВА Черга"
 }
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
