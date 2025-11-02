@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
-  environment:
-    QUEUE_FAKE_HOURS: "08:00-10:00"
-    QUEUE_FAKE_STATUS: "1"
-    QUEUE_FAKE_EMPTY: "0"
+    environment:
+      QUEUE_FAKE_HOURS: "08:00-10:00"
+      QUEUE_FAKE_STATUS: "1"
+      QUEUE_FAKE_EMPTY: "0"
