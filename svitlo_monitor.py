@@ -68,8 +68,16 @@ def extract_relevant(schedule, queue):
     for day in schedule:
         date = day.get("eventDate")
         qdata = day.get("queues", {}).get(queue, [])
-        hours = [x.get("shutdownHours") for x in qdata]
-        result.append({"date": date, "hours": hours})
+        simplified = [
+            {
+                "shutdownHours": x.get("shutdownHours"),
+                "from": x.get("from"),
+                "to": x.get("to"),
+                "status": x.get("status")
+            }
+            for x in qdata
+        ]
+        result.append({"date": date, "qdata": simplified})
     return result
 
 
@@ -93,7 +101,7 @@ def check_and_alert(queue, url):
                     qdata = day.get("queues", {}).get(queue, [])
                     if qdata:
                         outages = "\n".join(
-                            [f"🕒 {x.get('shutdownHours', '?')}" for x in qdata]
+                            [f"🕒 {x.get('from', '?')} - {x.get('to', '?')}" for x in qdata]
                         )
                     else:
                         outages = "✅ Немає відключень"
