@@ -4,9 +4,9 @@
     "queues": {
       "fake": [
         {
-          "shutdownHours": "08:00-10:00",
+          "shutdownHours": "08:00-11:00",
           "from": "08:00",
-          "to": "10:00",
+          "to": "11:00",
           "status": 1
         }
       ]

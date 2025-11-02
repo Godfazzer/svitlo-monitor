@@ -120,6 +120,7 @@ def check_and_alert(queue, url):
 
 
 def main():
+    time.sleep(3)
     send_telegram("🟢 Svitlo-monitor запущено.")
     while True:
         for queue, url in URLS.items():
