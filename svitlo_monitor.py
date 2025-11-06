@@ -1,4 +1,5 @@
 import os, requests, json, time
+from datetime import datetime
 
 URLS = {
     "4.2": "https://be-svitlo.oe.if.ua/schedule-by-queue?queue=4.2",
@@ -65,19 +66,29 @@ def save_current(queue, data):
 
 def extract_relevant(schedule, queue):
     result = []
+    today = datetime.now().date()
+
     for day in schedule:
-        date = day.get("eventDate")
+        date_str = day.get("eventDate")
+        try:
+            date_obj = datetime.strptime(date_str, "%d.%m.%Y").date()
+        except Exception:
+            continue
+
+        if date_obj < today:
+            continue
+
         qdata = day.get("queues", {}).get(queue, [])
         simplified = [
             {
                 "shutdownHours": x.get("shutdownHours"),
                 "from": x.get("from"),
                 "to": x.get("to"),
-                "status": x.get("status")
+                "status": x.get("status"),
             }
             for x in qdata
         ]
-        result.append({"date": date, "qdata": simplified})
+        result.append({"date": date_str, "qdata": simplified})
     return result
 
 
@@ -87,7 +98,20 @@ def check_and_alert(queue, url):
         current_relevant = extract_relevant(current, queue)
         last_relevant = extract_relevant(load_last(queue) or [], queue)
 
-        if last_relevant != current_relevant:
+        # Compare only dates that exist in current (future dates)
+        # This prevents false alarms when past dates are removed
+        has_change = False
+        for date, current_data in current_relevant.items():
+            if date not in last_relevant:
+                # New date added
+                has_change = True
+                break
+            elif last_relevant[date] != current_data:
+                # Schedule changed for existing date
+                has_change = True
+                break
+
+        if has_change:
             if not current:
                 # if API lisr is empty []
                 parts = [
