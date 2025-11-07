@@ -65,7 +65,8 @@ def save_current(queue, data):
 
 
 def extract_relevant(schedule, queue):
-    result = []
+
+    result = {}
     today = datetime.now().date()
 
     for day in schedule:
@@ -88,50 +89,61 @@ def extract_relevant(schedule, queue):
             }
             for x in qdata
         ]
-        result.append({"date": date_str, "qdata": simplified})
+        result[date_str] = simplified
     return result
 
 
 def check_and_alert(queue, url):
     try:
         current = fetch_schedule(url)
+        last = load_last(queue) or []
         current_relevant = extract_relevant(current, queue)
-        last_relevant = extract_relevant(load_last(queue) or [], queue)
+        last_relevant = extract_relevant(last, queue)
 
-        # Compare only dates that exist in current (future dates)
-        # This prevents false alarms when past dates are removed
-        has_change = False
-        for date, current_data in current_relevant.items():
-            if date not in last_relevant:
-                # New date added
-                has_change = True
-                break
-            elif last_relevant[date] != current_data:
-                # Schedule changed for existing date
-                has_change = True
-                break
 
-        if has_change:
-            if not current:
-                # if API lisr is empty []
-                parts = [
-                    f"*Дата:* ?\n*Оновлено:* ?\n*Відключення:*\n✅ Немає відключень"
-                ]
-            else:
-                parts = []
-                for day in current:
-                    date = day.get("eventDate", "?")
-                    updated = day.get("scheduleApprovedSince", "?")
-                    qdata = day.get("queues", {}).get(queue, [])
-                    if qdata:
-                        outages = "\n".join(
-                            [f"🕒 {x.get('from', '?')} - {x.get('to', '?')}" for x in qdata]
-                        )
-                    else:
-                        outages = "✅ Немає відключень"
-                    parts.append(
-                        f"*Дата:* {date}\n*Оновлено:* {updated}\n*Відключення:*\n{outages}"
+        today = datetime.now().strftime("%d.%m.%Y")
+        last_dates = [d.get("eventDate") for d in (last or [])]
+        last_only_past = all(
+            datetime.strptime(d, "%d.%m.%Y").date() < datetime.now().date()
+            for d in last_dates if d
+        )
+
+        if not current and last_only_past:
+            print(f"[{queue}] Empty schedule at new day start → ignored.")
+            save_current(queue, current)
+            return
+
+
+        if not current and not last_only_past:
+            display_name = QUEUE_NAMES.get(queue)
+            queue_label = f"{queue} ({display_name})" if display_name else queue
+            message = (
+                f"⚡ *Графік скасовано!* 🟢\n"
+                f"*Черга:* {queue_label}\n\n"
+                f"*Дата:* {today}\n"
+                f"*Відключення:* ✅ Немає відключень"
+            )
+            send_telegram(message)
+            save_current(queue, current)
+            print(f"[{queue}] Schedule cancelled → message sent.")
+            return
+
+
+        if current_relevant != last_relevant:
+            parts = []
+            for day in current:
+                date = day.get("eventDate", "?")
+                updated = day.get("scheduleApprovedSince", "?")
+                qdata = day.get("queues", {}).get(queue, [])
+                if qdata:
+                    outages = "\n".join(
+                        [f"🕒 {x.get('from', '?')} - {x.get('to', '?')}" for x in qdata]
                     )
+                else:
+                    outages = "✅ Немає відключень"
+                parts.append(
+                    f"*Дата:* {date}\n*Оновлено:* {updated}\n*Відключення:*\n{outages}"
+                )
 
             display_name = QUEUE_NAMES.get(queue)
             queue_label = f"{queue} ({display_name})" if display_name else queue
@@ -141,19 +153,19 @@ def check_and_alert(queue, url):
                 f"*Черга:* {queue_label}\n\n"
                 + "\n\n".join(parts)
             )
-
             send_telegram(message)
             save_current(queue, current)
-            print(f"[{queue}] Change in shutdown hours → message sent.")
+            print(f"[{queue}] Change detected → message sent.")
         else:
             print(f"[{queue}] No change in shutdown hours.")
+
     except Exception as e:
         print(f"[{queue}] Error: {e}")
 
 
 def main():
     time.sleep(3)
-    send_telegram("🟢 Svitlo-monitor запущено.")
+    print("🟢 Svitlo-monitor started.")
     while True:
         for queue, url in URLS.items():
             check_and_alert(queue, url)
