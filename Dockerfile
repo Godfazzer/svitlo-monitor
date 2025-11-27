@@ -6,4 +6,4 @@ COPY svitlo_monitor.py .
 
 RUN pip install --no-cache-dir requests
 
-CMD ["python", "svitlo_monitor.py"]
+CMD ["python", "-u", "svitlo_monitor.py"]
