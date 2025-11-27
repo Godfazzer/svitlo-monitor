@@ -42,24 +42,19 @@ def send_telegram(text):
 # =====================
 def fetch_schedule(url):
     headers = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.5123.100 Safari/537.36"
-    ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-    "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
-    "Referer": "https://be-svitlo.oe.if.ua/",
-    "Origin": "https://be-svitlo.oe.if.ua",
-    "Connection": "keep-alive",
-    "Sec-Fetch-Dest": "document",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-Site": "same-origin",
-    "Sec-Fetch-User": "?1",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "C",
     "Upgrade-Insecure-Requests": "1",
-    "Cache-Control": "max-age=0",
-    "Pragma": "no-cache",
+    "User-Agent": (
+        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) "
+        "AppleWebKit/605.1.15 (KHTML, like Gecko) "
+        "Version/16.0 Safari/605.1.15 Midori/6"
+    ),
+    "Connection": "keep-alive",
+    "Host": "be-svitlo.oe.if.ua",   # override target host
     }
+
 
     try:
         r = requests.get(url, headers=headers, timeout=10)
