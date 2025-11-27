@@ -1,12 +1,36 @@
+version: "3.9"
+
 services:
+  wireguard:
+    image: ghcr.io/linuxserver/wireguard:latest
+    container_name: svitlo-wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Kiev
+    volumes:
+      - ./wg:/config            # <-- put wg0.conf here (see step 2)
+      - /lib/modules:/lib/modules:ro
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+
   svitlo-monitor:
     build: .
     container_name: svitlo-monitor
     restart: unless-stopped
     env_file: .env
+    # share the wireguard service network namespace so all traffic goes through the WG tunnel
+    network_mode: "service:svitlo-wireguard"
+
   fake-svitlo-api:
     build: ./fake_api
     container_name: fake-svitlo-api
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    network_mode: "service:svitlo-wireguard"
+    # NOTE: port mapping will NOT work when using network_mode: service:<name>
+    # - "8000:8000" is intentionally omitted here.
+    
