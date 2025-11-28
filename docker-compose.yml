@@ -24,13 +24,13 @@ services:
     restart: unless-stopped
     env_file: .env
     # share the wireguard service network namespace so all traffic goes through the WG tunnel
-    network_mode: "service:svitlo-wireguard"
+    network_mode: "service:wireguard"
 
   fake-svitlo-api:
     build: ./fake_api
     container_name: fake-svitlo-api
     restart: unless-stopped
-    network_mode: "service:svitlo-wireguard"
+    network_mode: "service:wireguard"
     # NOTE: port mapping will NOT work when using network_mode: service:<name>
     # - "8000:8000" is intentionally omitted here.
     

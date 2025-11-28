@@ -154,6 +154,13 @@ def check_and_alert(queue, url):
         current_relevant = extract_relevant(current, queue)
         last_relevant = extract_relevant(last, queue)
 
+        # --- FIX: Remove past days from last_relevant BEFORE comparing ---
+        last_relevant = {
+            d: v for d, v in last_relevant.items()
+            if datetime.strptime(d, "%d.%m.%Y").date() >= datetime.now().date()
+        }
+        # --
+
         today = datetime.now().strftime("%d.%m.%Y")
         last_dates = [d.get("eventDate") for d in (last or [])]
 
