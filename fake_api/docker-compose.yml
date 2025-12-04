@@ -1,0 +1,7 @@
+services:
+  fake-svitlo-api:
+    build: .
+    container_name: fake-svitlo-api
+    restart: unless-stopped
+    ports:
+      - "80:8000"  # Exposed directly on Host Port 80
