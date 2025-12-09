@@ -1,0 +1,4 @@
+include:
+  - 01-wireguard/docker-compose.yml
+  - 02-monitor-main/docker-compose.yml
+  - 03-monitor-home/docker-compose.yml

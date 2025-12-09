@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  svitlo-monitor-home:
+    image: my-svitlo-monitor:latest # Reuses the image built in 02
+    container_name: svitlo-monitor-home
+    restart: unless-stopped
+    network_mode: "container:svitlo-wireguard"
+    environment:
+      - TZ=Europe/Kiev
+      - CHECK_INTERVAL=300
+      - BOT_TOKEN=${BOT_TOKEN}
+      - CHAT_ID=${CHAT_ID}
+      - MONITOR_CONFIG=${MONITOR_CONFIG}
+    volumes:
+      - ./cache:/app/cache

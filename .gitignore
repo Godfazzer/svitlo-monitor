@@ -1,0 +1,10 @@
+# Ignore environment variable files containing secrets
+**/.env
+
+# Ignore the WireGuard configuration folder containing private keys
+**/wg/*
+!**/wg/.gitkeep
+
+# Ignore Python cache
+**/cache/
+__pycache__/

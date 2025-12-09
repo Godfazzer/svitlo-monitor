@@ -1,0 +1,17 @@
+[
+  {
+    "eventDate": "02.11.2025",
+    "queues": {
+      "fake": [
+        {
+          "shutdownHours": "08:00-11:00",
+          "from": "08:00",
+          "to": "11:00",
+          "status": 1
+        }
+      ]
+    },
+    "createdAt": "02.11.2025 07:35",
+    "scheduleApprovedSince": "02.11.2025 07:35"
+  }
+]

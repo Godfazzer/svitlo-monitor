@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  svitlo-monitor-main:
+    build: .
+    image: my-svitlo-monitor:latest
+    container_name: svitlo-monitor-main
+    restart: unless-stopped
+    network_mode: "container:svitlo-wireguard"
+    # We load variables from the .env file automatically
+    # But we must explicitly pass them to the container
+    environment:
+      - TZ=Europe/Kiev
+      - CHECK_INTERVAL=300
+      - BOT_TOKEN=${BOT_TOKEN}
+      - CHAT_ID=${CHAT_ID}
+      - MONITOR_CONFIG=${MONITOR_CONFIG}
+    volumes:
+      - ./cache:/app/cache
