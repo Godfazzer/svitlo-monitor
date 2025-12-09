@@ -3,6 +3,7 @@
 
 # Ignore the WireGuard configuration folder containing private keys
 **/wg/*
+!**/wg/*.example
 !**/wg/.gitkeep
 
 # Ignore Python cache
